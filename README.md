@@ -13,3 +13,4 @@
 6. Request reviews from all remaining collaborators
 7. Once you have one approval, merge the pull request yourself
 8. If changes are needed, make changes locally and push them to github (same branch), the pull request will update automatically, just re-request review again.
+9. Use the issue board to track progress on all tasks
