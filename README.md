@@ -4,6 +4,7 @@
 - Every folder is a sub component/project of the whole system, see README in each folder for details
 
 ## Code contribution guideline
+0. Install [Editor](https://editorconfig.org) on your IDE
 1. Never push to master, master is locked 😀
 2. If you want to make a change, make a commit on a branch
 3. If your branch is stale (relative to master), [rebase](https://git-scm.com/docs/git-rebase) it
