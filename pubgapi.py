@@ -2,11 +2,16 @@ import requests
 import json
 import pandas as pd
 import time
+#from pymongo import MongoClient
+import os
+from dotenv import load_dotenv, find_dotenv
 
 url = "https://api.pubg.com/shards/steam/"
  
+load_dotenv(find_dotenv())
+
 headers = {
-  "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIwZjRkY2VmMC0yYWEzLTAxMzgtMzhmZC03NTczNzdiNTc2MzMiLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNTgwOTQ3ODUyLCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6IjIzNjA0MDUyNzQtcXEtIn0.W5JQk_es9sLhdCX88pS7Qs5tn6FOW7_6uDxuLH63Xe0",
+  "Authorization": "Bearer " + os.getenv("key"),
   "Accept": "application/vnd.api+json"
 }
 
