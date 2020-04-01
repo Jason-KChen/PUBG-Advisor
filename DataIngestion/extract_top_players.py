@@ -48,7 +48,7 @@ def extract_top_players():
     print("Total {} unique players found".format(len(top_player_names)))
 
     # We will be multiprocessing match lookup, so write to disk is an easier format to split loads
-    with open('player_names1.txt', 'w+') as f:
+    with open('player_names.txt', 'w+') as f:
         for player_name in list(top_player_names):
             f.write("{}\n".format(player_name))
 
