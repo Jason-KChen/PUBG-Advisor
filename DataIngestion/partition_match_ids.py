@@ -6,6 +6,8 @@ def get_all_matches():
 
     print(f"Read {len(all_match_ids)} players")
 
+    return all_match_ids
+
 
 def write_to_file(match_ids, partition_id):
     # write to disk
@@ -15,8 +17,7 @@ def write_to_file(match_ids, partition_id):
 
 
 if __name__ == "__main__":
-    # all_match_ids = get_all_matches()
-    all_match_ids = [10] * 223
+    all_match_ids = get_all_matches()
     total_count = len(all_match_ids)
 
     parition_count = 10
