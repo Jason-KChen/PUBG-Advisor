@@ -55,7 +55,7 @@ def parallel_discover_matches_and_filter(matches):
         # if curr_count == 20:
         #     break
 
-        if curr_count % 500 == 0:
+        if curr_count % 200 == 0:
             print(f"Process {curr_pid}: Currently on {curr_count} out of {len(matches)} matches with {fetch_fail_count} fetch and {parse_fail_count} parse errors")
 
         match_details_url = BASE_URL.format(match)
@@ -126,7 +126,7 @@ def split_match_ids(ids, partitions):
     total_count = len(ids)
     num_remaining = total_count
 
-    limit = total_count // partitions
+    limit = total_count // (partitions - 1)
     start_idx = 0
 
     while start_idx < total_count:
@@ -147,7 +147,7 @@ def discover_matches_and_filter(parition_file_name):
 
     print(f"Total number of matches: {len(match_ids)}")
 
-    PARTITIONS = 15
+    PARTITIONS = 20
     with Pool(PARTITIONS) as p:
         results = p.starmap(
             parallel_discover_matches_and_filter,
