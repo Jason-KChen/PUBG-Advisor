@@ -19,6 +19,11 @@ load_dotenv()
 # we extract the following
 # telemetricObjURL, createdAt, mapName
 
+def gen_API_headers():
+    return {
+        "Accept": "application/json"
+    }
+
 def rand_sleep():
     # anti DDoS
     sleep(randrange(1, 3))
@@ -32,10 +37,11 @@ def get_all_matches(file_name):
 
     print(f"Read {len(all_match_ids)} players")
 
+    return all_match_ids
 
 def parallel_discover_matches_and_filter(matches):
     BASE_URL = "https://api.pubg.com/shards/steam/matches/{}"
-    mode_filter = set("duo", "duo-fpp", "solo", "solo-fpp", "squad", "squad-fpp")
+    mode_filter = set(["duo", "duo-fpp", "solo", "solo-fpp", "squad", "squad-fpp"])
     MATCH_TYPE = "official"
     IS_CUSTOM_MATCH = False
 
@@ -49,16 +55,19 @@ def parallel_discover_matches_and_filter(matches):
         if curr_count == 20:
             break
 
-        if curr_count % 1000 == 0:
-            print(f"Process {curr_pid}:Currently on {curr_count} out of {len(match)} players")
+        if curr_count % 500 == 0:
+            print(f"Process {curr_pid}: Currently on {curr_count} out of {len(matches)} matches")
 
         match_details_url = BASE_URL.format(match)
 
         # request data from api and check if the connect is successfully
-        response = requests.get(match_details_url)
+        response = requests.get(
+            match_details_url,
+            headers=gen_API_headers()
+        )
 
         if response.status_code != 200:
-            print(f"Failed to fetch stats for {matches}")
+            print(f"Failed to fetch stats for {match}")
             fetch_fail_count += 1
 
             rand_sleep()
@@ -75,16 +84,22 @@ def parallel_discover_matches_and_filter(matches):
             # need them to exist
             match_stat["data"]["attributes"]["createdAt"]
             match_stat["data"]["attributes"]["mapName"]
-            match_stat["data"]["includes"]
+            match_stat["included"]
         except Exception as e:
+            # print(match_stat["data"]["attributes"]["isCustomMatch"])
+            # print(match_stat["data"]["attributes"]["matchType"])
+            # print(match_stat["data"]["attributes"]["gameMode"])
+            # print(e)
+
             parse_fail_count += 1
+            curr_count += 1
 
             rand_sleep()
             continue
 
         # get the telemetric ID
-        all_includes = match_stat["data"]["includes"]
-        for e in all_includes:
+        all_included = match_stat["included"]
+        for e in all_included:
             if e["type"] == "asset":
                 # Found the right location
                 match_details.append(
@@ -99,11 +114,62 @@ def parallel_discover_matches_and_filter(matches):
 
         # Done, wait and move forward
         rand_sleep()
+        curr_count += 1
+
+    print(f"Process {curr_pid} finished with {fetch_fail_count} fetch failures and {parse_fail_count} parse failures")
+
+    return match_details
+
+
+def split_match_ids(ids, partitions):
+    res = []
+    total_count = len(ids)
+    num_remaining = total_count
+
+    limit = total_count // partitions
+    start_idx = 0
+
+    while start_idx < total_count:
+        curr_seg_count = min(num_remaining, limit)
+        num_remaining -= curr_seg_count
+
+        res.append(
+            (ids[start_idx: start_idx + curr_seg_count],)
+        )
+        
+        start_idx += curr_seg_count
+
+    return res
 
 
 def discover_matches_and_filter(parition_file_name):
-    match_id = get_all_matches(partition_file_name)
-    
+    match_ids = get_all_matches(partition_file_name)
+
+    print(f"Total number of matches: {len(match_ids)}")
+
+    PARTITIONS = 15
+    with Pool(PARTITIONS) as p:
+        results = p.starmap(
+            parallel_discover_matches_and_filter,
+            split_match_ids(match_ids, PARTITIONS)
+        )
+
+        count = 0
+
+        if os.getenv("mode") == "dev":
+            # write to disk
+            with open(f'filtered_{parition_file_name}', 'w+') as f:
+                for res in results:
+                    for e in res:
+                        f.write("{},{},{}\n".format(e[0], e[1], e[2]))
+
+                        count += 1
+
+        else:
+            # Write to Mongo, TODO
+            pass
+
+        print(f"Finished with {count} qualified matches")
 
 
 if __name__ == "__main__":
