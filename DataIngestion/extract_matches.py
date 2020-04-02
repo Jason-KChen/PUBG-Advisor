@@ -56,14 +56,14 @@ def parrallelize_fetching(player_names, api_header):
             player_stat['data'][0]['relationships']['matches']['data']
         except Exception as e:
             print(f"Invalid data received for {player_name}")
-            sleep(6.3)
+            sleep(6.2)
             continue
 
         match_obj_list = player_stat['data'][0]['relationships']['matches']['data']
         for match_obj in match_obj_list:
             match_id_collected.add(match_obj['id'])
 
-        sleep(6.3)
+        sleep(6.2)
         curr_count += 1
 
     return list(match_id_collected)
@@ -76,13 +76,14 @@ def fetch_match_ids():
 
     print(f"Total number of players: {total_num_names}")
 
-    with Pool(3) as p:
+    with Pool(4) as p:
         results = p.starmap(
             parrallelize_fetching,
             [
-                (player_names[:total_num_names // 3], gen_API_headers(os.getenv("key"))),
-                (player_names[total_num_names // 3 + 1: total_num_names // 3 * 2], gen_API_headers(os.getenv("key1"))),
-                (player_names[total_num_names // 3 * 2 + 1:], gen_API_headers(os.getenv("key2"))),
+                (player_names[:total_num_names // 4], gen_API_headers(os.getenv("key0"))),
+                (player_names[total_num_names // 4 + 1: total_num_names // 4 * 2], gen_API_headers(os.getenv("key1"))),
+                (player_names[total_num_names // 4 * 2 + 1: total_num_names // 4 * 3], gen_API_headers(os.getenv("key2"))),
+                (player_names[total_num_names // 4 * 3 + 1:], gen_API_headers(os.getenv("key3"))),
             ]
         )
 
@@ -92,11 +93,11 @@ def fetch_match_ids():
 
     print(f"Finished, we got {len(final_match_ids)} matches")
 
-    if os.getenv("mode") == "DEV":
+    if os.getenv("mode") == "dev":
         # write to disk
         with open('match_ids.txt', 'w+') as f:
-            for player_name in list(final_match_ids):
-                f.write("{}\n".format(player_name))
+            for match_id in list(final_match_ids):
+                f.write("{}\n".format(match_id))
     else:
         # Write to Mongo, TODO
         pass
