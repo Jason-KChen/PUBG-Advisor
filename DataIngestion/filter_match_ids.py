@@ -56,7 +56,7 @@ def parallel_discover_matches_and_filter(matches):
         #     break
 
         if curr_count % 500 == 0:
-            print(f"Process {curr_pid}: Currently on {curr_count} out of {len(matches)} matches")
+            print(f"Process {curr_pid}: Currently on {curr_count} out of {len(matches)} matches with {fetch_fail_count} fetch and {parse_fail_count} parse errors")
 
         match_details_url = BASE_URL.format(match)
 
