@@ -46,10 +46,10 @@ if __name__ == "__main__":
 
             continue
 
-        # print(f"{total_count // 10 * idx + 1}:{total_count // 10 * idx + (total_count // 10)}")
+        # print(f"{total_count // 10 * idx}:{total_count // 10 * idx + (total_count // 10)}")
         write_to_file(
             all_match_ids[
-                total_count // 10 * idx + 1:
+                total_count // 10 * idx:
                 total_count // 10 * idx + (total_count // 10)
             ],
             idx + 1
