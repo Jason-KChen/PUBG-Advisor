@@ -52,8 +52,8 @@ def parallel_discover_matches_and_filter(matches):
     parse_fail_count = 0
 
     for match in matches:
-        if curr_count == 20:
-            break
+        # if curr_count == 20:
+        #     break
 
         if curr_count % 500 == 0:
             print(f"Process {curr_pid}: Currently on {curr_count} out of {len(matches)} matches")
