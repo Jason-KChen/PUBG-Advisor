@@ -147,7 +147,7 @@ def discover_matches_and_filter(parition_file_name):
 
     print(f"Total number of matches: {len(match_ids)}")
 
-    PARTITIONS = 30
+    PARTITIONS = 20
     with Pool(PARTITIONS) as p:
         results = p.starmap(
             parallel_discover_matches_and_filter,
