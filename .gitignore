@@ -139,3 +139,5 @@ dmypy.json
 .env
 
 package-lock.json
+
+.vscode
