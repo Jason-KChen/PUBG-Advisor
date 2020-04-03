@@ -97,6 +97,11 @@ def parallel_match_parsing(match_list):
     parse_fail_count = 0
     good_count = 0
 
+    # remember the current circles
+    latest_safe_zone_x = None
+    latest_safe_zone_y = None
+    latest_safe_zone_radius = None
+
     for match_info in match_list:
         # if curr_count == 20:
         #     break
@@ -125,16 +130,26 @@ def parallel_match_parsing(match_list):
         try:
             events = json.loads(res.text)
             for e in events:
+                if e["_T"] == "LogGameStatePeriodic":
+                    latest_safe_zone_x = e["gameState"]["safetyZonePosition"]["x"]
+                    latest_safe_zone_y = e["gameState"]["safetyZonePosition"]["y"]
+                    latest_safe_zone_radius = e["gameState"]["safetyZoneRadius"]
+                    
+                    continue
+
                 # applying filter as stated in issue 4
                 if (e["_T"] == "LogPlayerKill" or e["_T"] == "LogPlayerMakeGroggy") and \
                     e["damageTypeCategory"] == "Damage_Gun" and \
                     e["common"]["isGame"] >= 1 and \
-                    e["distance"] > 100:
+                    e["distance"] > 100 and \
+                    latest_safe_zone_x and \
+                    latest_safe_zone_y and \
+                    latest_safe_zone_radius:
 
                     attacker_name = "killer" if e["_T"] == "LogPlayerKill" else "attacker"
 
                     kill_details.append(
-                        "{},{},{},{},{},{},{},{},{},{},{}".format(
+                        "{},{},{},{},{},{},{},{},{},{},{},{},{},{}".format(
                             time_string,
                             map_name,
                             e[attacker_name]["name"],
@@ -144,6 +159,9 @@ def parallel_match_parsing(match_list):
                             int(e["victim"]["location"]["y"]),
                             e["common"]["isGame"],
                             e["damageCauserName"],
+                            int(latest_safe_zone_x),
+                            int(latest_safe_zone_y),
+                            int(latest_safe_zone_radius),
                             get_scope(e["damageCauserAdditionalInfo"]),
                             get_muzzle(e["damageCauserAdditionalInfo"])
                         )
@@ -152,7 +170,7 @@ def parallel_match_parsing(match_list):
                     good_count += 1
             
         except KeyError as error:
-            print(error)
+            print(f"Found key error: {error}")
             parse_fail_count += 1
             curr_count += 1
 
