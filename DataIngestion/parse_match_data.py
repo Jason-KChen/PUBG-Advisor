@@ -103,8 +103,8 @@ def parallel_match_parsing(match_list):
     latest_safe_zone_radius = None
 
     for match_info in match_list:
-        if curr_count == 20:
-            break
+        # if curr_count == 20:
+        #     break
 
         if curr_count % 150 == 0:
             print(f"Process {curr_pid}: Currently on {curr_count} out of {len(match_list)} matches with {fetch_fail_count} fetch and {parse_fail_count} parse errors")
