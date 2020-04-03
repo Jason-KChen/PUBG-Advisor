@@ -143,7 +143,8 @@ def parallel_match_parsing(match_list):
                     e["common"]["isGame"] >= 1 and \
                     e["distance"] > 100 and \
                     latest_safe_zone_x and \
-                    latest_safe_zone_y:
+                    latest_safe_zone_y and \
+                    latest_safe_zone_radius:
 
                     attacker_name = "killer" if e["_T"] == "LogPlayerKill" else "attacker"
 
