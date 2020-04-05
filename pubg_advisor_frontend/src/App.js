@@ -6,7 +6,7 @@ import {h337} from 'heatmap.js';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { Map, ImageOverlay, TileLayer, Marker, Popup} from "react-leaflet";
+import { Map, ImageOverlay, TileLayer, Marker, Popup, CircleMarker} from "react-leaflet";
 import L from 'leaflet';
 
 function getStyles() {
@@ -27,7 +27,11 @@ function getStyles() {
 const mapNames = ["Camp Jackal", "Erangel", "Karakin", "Miramar", "Sanhok", "Vikendi"];
 
 
-
+class SearchCircle extends Component {
+    constructor(props) {
+        super(props);
+    }
+}
 
 class MapComponent extends Component {
     
@@ -38,9 +42,11 @@ class MapComponent extends Component {
         this.state = {
             currentMap: mapNames[0],
             currentMapFile: this.getMapFileName(mapNames[0]),
-            selectedPoint: null
+            selectedPoint: null,
+            selectedRadius: null
         };
         // this.handleSelect = this.handleSelect.bind(this);
+        this.updateCircle = this.updateCircle.bind(this);
     }
 
     // componentDidMount(){
@@ -83,7 +89,8 @@ class MapComponent extends Component {
         this.setState(
             {currentMap: selectedMap,
             currentMapFile: fileName,
-            selectedPoint: this.state.selectedPoint
+            selectedPoint: this.state.selectedPoint,
+            selectedRadius: this.state.selectedRadius
             }
         );
     }
@@ -95,12 +102,22 @@ class MapComponent extends Component {
         this.setState(
             {currentMap: this.state.currentMap,
             currentMapFile: this.state.currentMapFile,
-            selectedPoint: newPoint.latlng
+            selectedPoint: newPoint.latlng,
+            selectedRadius: 20
             }
         );
     }
     
-
+    updateCircle(newRadius) {
+        console.log(newRadius);
+        this.setState(
+            {currentMap: this.state.currentMap,
+            currentMapFile: this.state.currentMapFile,
+            selectedPoint: this.state.selectedPoint,
+            selectedRadius: newRadius.target.value
+            }
+        );
+    }
 
     render() {
         
@@ -129,7 +146,9 @@ class MapComponent extends Component {
         
      
         return(
+
             <div>
+                
                 <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} >
                     {mapNames.map((value, index) => {
                         return <ListItem key={index} name={value} handleSelect={this.handleSelect}/>
@@ -150,9 +169,21 @@ class MapComponent extends Component {
                     { this.state.selectedPoint !== null &&
                         <Marker position={this.state.selectedPoint}>
                             <Popup>
-                                <span>Popup</span>
+                                <form onSubmit={this.handleSubmit}>
+                                    <label>
+                                      Name:
+                                        <input value={this.state.selectedRadius} onChange={this.updateCircle} />
+                                    </label>
+                                    <input type="submit" value="Submit" />
+                                </form>
                             </Popup>
-                        </Marker>
+                        </Marker> 
+                    } 
+                    {
+                        this.state.selectedPoint !== null &&
+                        <CircleMarker center={this.state.selectedPoint} color="red" radius={this.state.selectedRadius}>
+                            <Popup>Popup in CircleMarker</Popup>
+                        </CircleMarker>
                     }
                 </Map>}
             </div>
