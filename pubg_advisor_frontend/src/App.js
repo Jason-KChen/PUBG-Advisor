@@ -1,14 +1,13 @@
 import './App.css';
 import React, {Component, useEffect} from 'react';
 import { TabView } from './tabs/TabView';
-import {h337} from 'heatmap.js';
-
-import DropdownButton from 'react-bootstrap/DropdownButton'
-import Dropdown from 'react-bootstrap/Dropdown'
-import { Map, ImageOverlay, TileLayer, Marker, Popup} from "react-leaflet";
 import Leaflet from 'leaflet';
-import L from 'leaflet.heat';
-
+import {h337} from 'heatmap.js';
+import HeatmapLayer from 'react-leaflet-heatmap-layer';
+import DropdownButton from 'react-bootstrap/DropdownButton';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { Map, ImageOverlay, TileLayer, Marker, Popup} from "react-leaflet";
+// import L from 'leaflet';
 
 function getStyles() {
   return {
@@ -71,6 +70,16 @@ class MapComponent extends Component {
         //   container: document.querySelector('.mapContainer')
         // });
         
+        
+        // if you have a set of datapoints always use setData instead of addData
+        // for data initialization
+        // heatmapInstance.setData(data);
+        
+        // heatmapLayer.setData(data);
+        
+    }
+
+    render() {
         var points = [];
         var max = 0;
         var width = 840;
@@ -80,30 +89,17 @@ class MapComponent extends Component {
         while (len--) {
           var val = Math.floor(Math.random()*100);
           max = Math.max(max, val);
-          var point = {
-         x: Math.floor(Math.random()*width),
-         y: Math.floor(Math.random()*height),
-         value: val
-          };
+          var point = [
+             Math.floor(Math.random()*width),
+             Math.floor(Math.random()*height)
+              ];
           points.push(point);
         }
         // heatmap data format
         var data = {
-          max: max,
           data: points
         };
-        // if you have a set of datapoints always use setData instead of addData
-        // for data initialization
-        // heatmapInstance.setData(data);
-        
-        // heatmapLayer.setData(data);
-
-        var x = L.heatLayer();
-    }
-
-    render() {
-        const buttonRef = React.createRef();
-
+        console.log(points);
         const center = [0,0];
         var b = 300;
 
@@ -113,13 +109,20 @@ class MapComponent extends Component {
         // <img src={"maps/" + this.state.currentMapFile + ".png"}/>
         return(
             <div>
-                <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} ref = {buttonRef}>
+                <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} >
                     {mapNames.map((value, index) => {
                         return <ListItem key={index} name={value} handleSelect={this.handleSelect}/>
 
                     })}
                 </DropdownButton>
                 <Map center={[b/2,b/2]} zoom={4} ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={Leaflet.CRS.Simple}>
+                    <HeatmapLayer
+                        fitBoundsOnLoad
+                        fitBoundsOnUpdate
+                        points={points}
+                        longitudeExtractor={m => m[1]}
+                        latitudeExtractor={m => m[0]}
+                        intensityExtractor={m => parseFloat(m[2])} />
                     <ImageOverlay url={"maps/" + this.state.currentMapFile+ ".png"} bounds={[[0,0], [b,b]]}/>
                 </Map>}
             </div>
