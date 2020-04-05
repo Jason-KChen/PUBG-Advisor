@@ -1,11 +1,14 @@
 import './App.css';
 import React, {Component, useEffect} from 'react';
 import { TabView } from './tabs/TabView';
-import h337 from 'heatmap.js';
+import {h337} from 'heatmap.js';
+
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Map, ImageOverlay, TileLayer, Marker, Popup} from "react-leaflet";
-import L from 'leaflet';
+import Leaflet from 'leaflet';
+import L from 'leaflet.heat';
+
 
 function getStyles() {
   return {
@@ -22,8 +25,8 @@ function getStyles() {
   }
 }
 
-
 const mapNames = ["Camp Jackal", "Erangel", "Karakin", "Miramar", "Sanhok", "Vikendi"];
+
 
 
 
@@ -62,7 +65,6 @@ class MapComponent extends Component {
     }
 
     componentDidMount() {
-    
 
         // var heatmapInstance = h337.create({
         //   // only container is required, the rest will be defaults
@@ -93,31 +95,33 @@ class MapComponent extends Component {
         // if you have a set of datapoints always use setData instead of addData
         // for data initialization
         // heatmapInstance.setData(data);
+        
+        // heatmapLayer.setData(data);
 
+        var x = L.heatLayer();
     }
-
-    
-    
 
     render() {
         const buttonRef = React.createRef();
+
         const center = [0,0];
-        var bounds = [[0,0], [1000,1000]];
+        var b = 300;
 
         function ListItem(args) {
             return <Dropdown.Item onSelect={args.handleSelect} eventKey={args.name}>{args.name}</Dropdown.Item>
         }
-
+        // <img src={"maps/" + this.state.currentMapFile + ".png"}/>
         return(
             <div>
-            <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} ref = {buttonRef}>
-                {mapNames.map((value, index) => {
-                    return <ListItem key={index} name={value} handleSelect={this.handleSelect}/>
-                })}
-            </DropdownButton>
-            <div className="mapContainer">
-                <img src={"maps/" + this.state.currentMapFile + ".png"}/>
-            </div>
+                <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} ref = {buttonRef}>
+                    {mapNames.map((value, index) => {
+                        return <ListItem key={index} name={value} handleSelect={this.handleSelect}/>
+
+                    })}
+                </DropdownButton>
+                <Map center={[b/2,b/2]} zoom={4} ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={Leaflet.CRS.Simple}>
+                    <ImageOverlay url={"maps/" + this.state.currentMapFile+ ".png"} bounds={[[0,0], [b,b]]}/>
+                </Map>}
             </div>
         );
     
