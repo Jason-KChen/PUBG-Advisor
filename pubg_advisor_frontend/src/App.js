@@ -129,21 +129,22 @@ class MapComponent extends Component {
         }
 
         var points = [];
-        var max = 0;
-        var width = 840;
-        var height = 400;
-        var len = 200;
+        // var max = 0;
+        // var width = 840;
+        // var height = 400;
+        // var len = 200;
 
-        while (len--) {
-          var val = Math.floor(Math.random()*100);
-          max = Math.max(max, val);
-          var point = [
-             Math.floor(Math.random()*width),
-             Math.floor(Math.random()*height)
-              ];
-          points.push(point);
-        }
-        
+        // while (len--) {
+        //   var val = Math.floor(Math.random()*100);
+        //   max = Math.max(max, val);
+        //   var point = [
+        //      Math.floor(Math.random()*width),
+        //      Math.floor(Math.random()*height)
+        //       ];
+        //   points.push(point);
+        // }
+
+        console.log(points);
      
         return(
 
@@ -171,7 +172,7 @@ class MapComponent extends Component {
                             <Popup>
                                 <form onSubmit={this.handleSubmit}>
                                     <label>
-                                      Name:
+                                      Search Radius
                                         <input value={this.state.selectedRadius} onChange={this.updateCircle} />
                                     </label>
                                     <input type="submit" value="Submit" />
