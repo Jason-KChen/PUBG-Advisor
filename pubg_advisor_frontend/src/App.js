@@ -1,8 +1,5 @@
 import './App.css';
-import React, {Component, useEffect} from 'react';
-import { TabView } from './tabs/TabView';
-import Leaflet from 'leaflet';
-import {h337} from 'heatmap.js';
+import React, {Component} from 'react';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -110,8 +107,7 @@ class MapComponent extends Component {
 
                     })}
                 </DropdownButton>
-                <Map center={this.state.selectedPoint ? this.state.selectedPoint :[b/2,b/2]} zoom={2} id="physicalMap" ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={Leaflet.CRS.Simple} onClick={this.userMapClick}>
-                    <GridLayer/>
+                <Map center={this.state.selectedPoint ? this.state.selectedPoint :[b/2,b/2]} zoom={2} id="physicalMap" ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={L.CRS.Simple} onClick={this.userMapClick}>
                     <HeatmapLayer
                         fitBoundsOnLoad
                         fitBoundsOnUpdate
