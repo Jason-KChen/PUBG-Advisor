@@ -6,7 +6,7 @@ import {h337} from 'heatmap.js';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { Map, ImageOverlay, TileLayer, Marker, Popup, CircleMarker} from "react-leaflet";
+import { Map, ImageOverlay, GridLayer, Marker, Popup, CircleMarker} from "react-leaflet";
 import L from 'leaflet';
 
 function getStyles() {
@@ -26,12 +26,6 @@ function getStyles() {
 
 const mapNames = ["Camp Jackal", "Erangel", "Karakin", "Miramar", "Sanhok", "Vikendi"];
 
-
-class SearchCircle extends Component {
-    constructor(props) {
-        super(props);
-    }
-}
 
 class MapComponent extends Component {
     
@@ -117,6 +111,7 @@ class MapComponent extends Component {
                     })}
                 </DropdownButton>
                 <Map center={this.state.selectedPoint ? this.state.selectedPoint :[b/2,b/2]} zoom={2} id="physicalMap" ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={Leaflet.CRS.Simple} onClick={this.userMapClick}>
+                    <GridLayer/>
                     <HeatmapLayer
                         fitBoundsOnLoad
                         fitBoundsOnUpdate
@@ -127,7 +122,8 @@ class MapComponent extends Component {
                         latitudeExtractor={m => m[0]}
                         intensityExtractor={m => parseFloat(m[2])} />
                     <ImageOverlay url={"maps/" + this.state.currentMapFile+ ".png"} bounds={[[0,0], [b,b]]}/>
-                    { this.state.selectedPoint !== null &&
+                    { 
+                        this.state.selectedPoint !== null &&
                         <Marker position={this.state.selectedPoint}>
                             <Popup>
                                 <form onSubmit={this.handleSubmit}>
