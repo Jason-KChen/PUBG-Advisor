@@ -10,16 +10,16 @@ import { Map, ImageOverlay, TileLayer, Marker, Popup, CircleMarker} from "react-
 import L from 'leaflet';
 
 function getStyles() {
-  return {
+    return {
     // Position the Panel in the middle of the screen
-    backgroundStyle: {
-      justifyContent: "center",
-      alignItems: "center"
+      backgroundStyle: {
+        justifyContent: "center",
+        alignItems: "center"
     },
     // Size of the Panel relative to the whole screen
-    tabViewWrapper: {
-      width: "70%",
-      height: "70%"
+      tabViewWrapper: {
+        width: "70%",
+        height: "70%"
     }
   }
 }
@@ -49,29 +49,6 @@ class MapComponent extends Component {
         this.updateCircle = this.updateCircle.bind(this);
     }
 
-    // componentDidMount(){
-    //     var points = [];
-    //     var max = 0;
-    //     var width = 840;
-    //     var height = 400;
-    //     var len = 200;
-
-    //     while (len--) {
-    //       var val = Math.floor(Math.random()*100);
-    //       max = Math.max(max, val);
-    //       var point = [
-    //          Math.floor(Math.random()*width),
-    //          Math.floor(Math.random()*height)
-    //           ];
-    //       points.push(point);
-    //     }
-    //     // heatmap data format
-    //     var data = {
-    //       data: points
-    //     };
-    //     console.log(points);
-    // }
-
     getMapFileName(mapName) {
         var fileName =null;
         if (mapName == "Camp Jackal") {
@@ -97,8 +74,6 @@ class MapComponent extends Component {
 
 
     userMapClick = (newPoint) => {
-        // console.log(newPoint);
-        // console.log(this.map.setView());
         this.setState(
             {currentMap: this.state.currentMap,
             currentMapFile: this.state.currentMapFile,
@@ -129,22 +104,7 @@ class MapComponent extends Component {
         }
 
         var points = [];
-        // var max = 0;
-        // var width = 840;
-        // var height = 400;
-        // var len = 200;
-
-        // while (len--) {
-        //   var val = Math.floor(Math.random()*100);
-        //   max = Math.max(max, val);
-        //   var point = [
-        //      Math.floor(Math.random()*width),
-        //      Math.floor(Math.random()*height)
-        //       ];
-        //   points.push(point);
-        // }
-
-        console.log(points);
+        
      
         return(
 
@@ -194,16 +154,12 @@ class MapComponent extends Component {
     
 }
 
-class App extends Component
-   {
+class App extends Component {
   
-
-  render() {
-
-    return (
-        <MapComponent/>   
-    );
-  }
+    render() {
+        return (
+            <MapComponent/>   
+        );
+    }
 }
 export default App;
-  
