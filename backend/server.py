@@ -2,6 +2,14 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask import request
 
+# PySpark Stuff
+import json
+import os
+import math
+from pyspark import SparkContext
+import time
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -60,7 +68,85 @@ def weapon_rankning():
 
 @app.route("/kill")
 def get_kill_loc():
-    return "TODO"
+    raw_map_name = request.args.get('map_name')
+    raw_zone_x = request.args.get('x')
+    raw_zone_y = request.args.get('y')
+    raw_zone_radius = request.args.get('radius')
+
+    print("Received request with params {}, {}, {}, {}".format(raw_map_name, raw_zone_x, raw_zone_y, raw_zone_radius))
+    try:
+        assert int(raw_zone_x) > 0
+        assert int(raw_zone_y) > 0
+        assert int(raw_zone_radius) > 100
+        assert len(raw_map_name) > 5
+        assert raw_map_name.endswith("Main")
+    except Exception:
+        return jsonify({
+            "status": False,
+            "message": "Wrong format, check log"
+        })
+    start_time = time.time()
+
+    # Now real Spark logic
+    SparkContext.setSystemProperty('spark.executor.memory', '2200m')
+    sc = SparkContext("spark://master:7077", "Location Finder")
+    sc.setLogLevel("ERROR")
+
+    print("Spark Connected")
+
+    MAP_NAME = raw_map_name
+    INPUT_ZONE_X = int(raw_zone_x)
+    INPUT_ZONE_Y = int(raw_zone_y)
+    INPUT_ZONE_RADIUS = int(raw_zone_radius)
+
+    ZONE_CENTER_OFFSET = 40000
+    ZONE_RADIUS_OFFSET = int(INPUT_ZONE_RADIUS / 4)
+
+    def distance_cal(x1, y1, x2, y2):
+        return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+    def construst_info(e):
+        splitted = e.split(",")
+        attacker_x = int(splitted[3])
+        attacker_y = int(splitted[4])
+        
+        zone_x = int(splitted[9])
+        zone_y = int(splitted[10])
+        zone_radius = int(splitted[11])
+        
+        return (
+            attacker_x,
+            attacker_y,
+            int(distance_cal(attacker_x, attacker_y, INPUT_ZONE_X, INPUT_ZONE_Y)), # Player kill location offset
+            int(distance_cal(zone_x, zone_y, INPUT_ZONE_X, INPUT_ZONE_Y)), # Zone center offset
+            abs(zone_radius - INPUT_ZONE_RADIUS) # zone radius offset
+        )
+
+    def filter_info(e):
+        return True if e[3] < ZONE_CENTER_OFFSET and e[4] < ZONE_RADIUS_OFFSET else False
+
+    whole_file_rdd = sc.textFile("hdfs://master:9000/data/{}_data.txt".format(MAP_NAME))
+
+    # split the rows and take 
+    res = whole_file_rdd \
+        .map(lambda e : construst_info(e)) \
+        .filter(lambda e: filter_info(e)) \
+        .sortBy(lambda e : e[2]).map(lambda e : (e[0], e[1])).take(5000)
+
+    # close spark
+    sc.stop()
+
+    return jsonify({
+        "status": True,
+        "data": [
+            {
+                "x": e[0],
+                "y": e[1]
+            }
+            for e in res
+        ],
+        "time_spent": time.time() - start_time 
+    })
 
 if __name__ == '__main__':
     app.run(host='master', port=12315)
