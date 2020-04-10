@@ -39,35 +39,26 @@ def construst_info(e):
     return (
         attacker_x,
         attacker_y,
-        zone_x,
-        zone_y,
-        zone_radius,
         int(distance_cal(attacker_x, attacker_y, INPUT_ZONE_X, INPUT_ZONE_Y)), # Player kill location offset
         int(distance_cal(zone_x, zone_y, INPUT_ZONE_X, INPUT_ZONE_Y)), # Zone center offset
         abs(zone_radius - INPUT_ZONE_RADIUS) # zone radius offset
     )
 
 def filter_info(e):
-    return True if e[6] < ZONE_CENTER_OFFSET and e[7] < ZONE_RADIUS_OFFSET else False
+    return True if e[3] < ZONE_CENTER_OFFSET and e[4] < ZONE_RADIUS_OFFSET else False
 
 whole_file_rdd = sc.textFile("hdfs://master:9000/data/{}_data.txt".format(MAP_NAME))
-
-header = whole_file_rdd.first() #extract header
-raw_data_rdd = whole_file_rdd.filter(lambda e : e != header)
 
 # start the logic from here
 
 # split the rows and take 
-splitted = raw_data_rdd.map(lambda e : construst_info(e))
-
-splitted.take(5)
+splitted = whole_file_rdd.map(lambda e : construst_info(e))
 
 filtered = splitted.filter(lambda e: filter_info(e))    
 
 
 # sort by player location
-
-final_rdd = filtered.sortBy(lambda e : e[5]).map(lambda e : (e[0], e[1])).take(5000)
+final_rdd = filtered.sortBy(lambda e : e[2]).map(lambda e : (e[0], e[1])).take(5000)
 
 final_json_string = [
     {
