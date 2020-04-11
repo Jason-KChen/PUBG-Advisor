@@ -1,18 +1,7 @@
-import React, {
-  Component
-} from 'react';
-
+import React, { Component } from 'react';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
-import {
-  Map,
-  ImageOverlay,
-  Marker,
-  Popup,
-  CircleMarker
-} from "react-leaflet";
-import {
-  NativeSelect
-} from '@material-ui/core';
+import { Map, ImageOverlay, Marker, Popup, CircleMarker } from "react-leaflet";
+import { NativeSelect } from '@material-ui/core';
 import L from 'leaflet';
 import './HuntingLocationPanel.css';
 
