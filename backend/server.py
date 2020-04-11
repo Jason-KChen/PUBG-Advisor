@@ -85,22 +85,6 @@ def get_kill_loc():
             "status": False,
             "message": "Wrong format, check log"
         })
-    start_time = time.time()
-
-    # Now real Spark logic
-    SparkContext.setSystemProperty('spark.executor.memory', '2200m')
-    sc = SparkContext("spark://master:7077", "Location Finder")
-    sc.setLogLevel("ERROR")
-
-    print("Spark Connected")
-
-    MAP_NAME = raw_map_name
-    INPUT_ZONE_X = int(raw_zone_x)
-    INPUT_ZONE_Y = int(raw_zone_y)
-    INPUT_ZONE_RADIUS = int(raw_zone_radius)
-
-    ZONE_CENTER_OFFSET = 40000
-    ZONE_RADIUS_OFFSET = int(INPUT_ZONE_RADIUS / 4)
 
     def distance_cal(x1, y1, x2, y2):
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
@@ -125,28 +109,57 @@ def get_kill_loc():
     def filter_info(e):
         return True if e[3] < ZONE_CENTER_OFFSET and e[4] < ZONE_RADIUS_OFFSET else False
 
-    whole_file_rdd = sc.textFile("hdfs://master:9000/data/{}_data.txt".format(MAP_NAME))
+    start_time = time.time()
+    sc = None
 
-    # split the rows and take 
-    res = whole_file_rdd \
-        .map(lambda e : construst_info(e)) \
-        .filter(lambda e: filter_info(e)) \
-        .sortBy(lambda e : e[2]).map(lambda e : (e[0], e[1])).take(5000)
+    try:
+        # Now real Spark logic
+        SparkContext.setSystemProperty('spark.executor.memory', '2200m')
+        sc = SparkContext("spark://master:7077", "Location Finder")
+        sc.setLogLevel("ERROR")
 
-    # close spark
-    sc.stop()
+        print("Spark Connected")
 
-    return jsonify({
-        "status": True,
-        "data": [
-            {
-                "x": e[0],
-                "y": e[1]
-            }
-            for e in res
-        ],
-        "time_spent": time.time() - start_time 
-    })
+        MAP_NAME = raw_map_name
+        INPUT_ZONE_X = int(raw_zone_x)
+        INPUT_ZONE_Y = int(raw_zone_y)
+        INPUT_ZONE_RADIUS = int(raw_zone_radius)
+
+        ZONE_CENTER_OFFSET = 40000
+        ZONE_RADIUS_OFFSET = int(INPUT_ZONE_RADIUS / 4)
+
+        whole_file_rdd = sc.textFile("hdfs://master:9000/data/{}_data.txt".format(MAP_NAME))
+
+        # split the rows and take 
+        res = whole_file_rdd \
+            .map(lambda e : construst_info(e)) \
+            .filter(lambda e: filter_info(e)) \
+            .sortBy(lambda e : e[2]).map(lambda e : (e[0], e[1])).take(5000)
+
+        # close spark
+        sc.stop()
+
+        return jsonify({
+            "status": True,
+            "data": [
+                {
+                    "x": e[0],
+                    "y": e[1]
+                }
+                for e in res
+            ],
+            "time_spent": time.time() - start_time 
+        })
+    
+    except Exception as ex:
+        if sc is not None:
+            sc.stop()
+
+        return jsonify({
+            "status": False,
+            "message": str(ex)
+        })
+
 
 if __name__ == '__main__':
     app.run(host='master', port=12315)
