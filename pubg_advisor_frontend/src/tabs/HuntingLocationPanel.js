@@ -1,74 +1,83 @@
 import React, { Component } from 'react';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import { Map, ImageOverlay, Marker, Popup, CircleMarker } from "react-leaflet";
+import  HashMap  from 'hashmap';
 import { NativeSelect } from '@material-ui/core';
 import L from 'leaflet';
 import './HuntingLocationPanel.css';
-
-const mapNames = ["Camp Jackal", "Erangel", "Karakin", "Miramar", "Sanhok", "Vikendi"];
+import { MAPNAMES, MAPDIMENSIONS } from './tabsConstants.js';
 
 class MapComponent extends Component {
 
   constructor(props) {
-    super(props)
-    var fileName = this.getMapFileName(mapNames[0])
+    super(props);
+    var displayName = MAPNAMES[0][0];
+    var fileName = this.getMapFileName(displayName);
+    var apiNameMap = new HashMap(MAPNAMES);
+    var mapDimensions = new HashMap(MAPDIMENSIONS);
+    var initialMapDimension = mapDimensions.get(displayName);
+
     this.state = {
-      currentMap: mapNames[0],
-      currentMapFile: this.getMapFileName(mapNames[0]),
+      currentMap: displayName,
+      currentMapFile: fileName,
+      currentMapDimension: initialMapDimension,
       selectedPoint: null,
-      selectedRadius: null
+      selectedRadius: null,
+      apiNames: apiNameMap,
+      mapDimensions: mapDimensions
     };
-    // this.handleSelect = this.handleSelect.bind(this);
     this.updateCircle = this.updateCircle.bind(this);
+
   }
 
   getMapFileName(mapName) {
     var fileName = null;
     if (mapName === "Camp Jackal") {
       fileName = "Camp_Jackal";
-    } else {
+    } else if (mapName === "Erangel (Remastered)") {
+      fileName = "Erangel_Remastered";
+    }else {
       fileName = mapName;
     }
     return fileName;
   }
 
   handleSelect = (event) => {
-    console.log(event.target);
     var selectedMap = event.target.value;
-    console.log(selectedMap);
     var fileName = this.getMapFileName(selectedMap);
-
+    var nextMapDim = this.state.mapDimensions.get(selectedMap);
     this.setState({
       currentMap: selectedMap,
       currentMapFile: fileName,
-      selectedPoint: this.state.selectedPoint,
-      selectedRadius: this.state.selectedRadius
+      currentMapDimension: nextMapDim
+    }, () => {
+      console.log(this.state);
     });
   }
 
 
   userMapClick = (newPoint) => {
     this.setState({
-      currentMap: this.state.currentMap,
-      currentMapFile: this.state.currentMapFile,
       selectedPoint: newPoint.latlng,
-      selectedRadius: 20
+      selectedRadius: 20,
     });
   }
 
   updateCircle(newRadius) {
     console.log(newRadius);
     this.setState({
-      currentMap: this.state.currentMap,
-      currentMapFile: this.state.currentMapFile,
-      selectedPoint: this.state.selectedPoint,
-      selectedRadius: newRadius.target.value
+      selectedRadius: newRadius.target.value,
     });
   }
 
-  render() {
+  findKills = (clickEvent) => {
+    clickEvent.preventDefault();
+    console.log("Finding kills");
+    console.log(this.state.selectedPoint);
+  }
 
-    const center = [0, 0];
+
+  render() {
     var b = 300;
 
     function ListItem(args) {
@@ -81,15 +90,42 @@ class MapComponent extends Component {
 
     return (
       <div>
-        <NativeSelect id="select" value={ this.state.currentMap} onChange={ this.handleSelect}> 
+        <NativeSelect id="select" value={ this.state.currentMap} onChange={this.handleSelect} multiple={true}> 
           {
-            mapNames.map((value, index) => { 
-            return <ListItem key={ index } name={ value } /> }) 
+            MAPNAMES.map((value, index) => { 
+              return <ListItem key={ index } name={ value[0] } /> 
+            }) 
           }
         </NativeSelect>
-        <Map center={ this.state.selectedPoint ? this.state.selectedPoint : [b / 2, b / 2] } zoom={ 2 } id="physicalMap" ref={ (ref)=> { this.map = ref; } } setMaxBounds = { [ [0, 0], [b, b] ] } crs = { L.CRS.Simple } onClick = { this.userMapClick } >
-          <HeatmapLayer fitBoundsOnLoad fitBoundsOnUpdate points={ points } longitudeExtractor={ m=> m[1] } latitudeExtractor = { m => m[0] } intensityExtractor = { m => parseFloat(m[2]) } />
-            <ImageOverlay url={ "maps/" + this.state.currentMapFile + ".png" } bounds={ [ [0, 0], [b, b] ] } /> 
+        <Map center={ this.state.selectedPoint ? this.state.selectedPoint : [this.state.currentMapDimension / 2, this.state.currentMapDimension / 2] } 
+        zoom={ 1 } id="physicalMap" ref={ (ref)=> { this.map = ref; } } 
+        setMaxBounds = { [ [0, 0], [this.state.currentMapDimension, this.state.currentMapDimension] ] } 
+        crs = { 
+          L.extend({}, L.CRS.Simple, {
+            projection: L.Projection.LonLat,
+            transformation: new L.Transformation(.003, 0, .003, 0),
+            scale: function(zoom) {
+              return Math.pow(2, zoom);
+            },
+
+            zoom: function(scale) {
+              return Math.log(scale) / Math.LN2;
+            },
+
+            distance: function(latlng1, latlng2) {
+              var dx = latlng2.lng - latlng1.lng,
+                dy = latlng2.lat - latlng1.lat;
+
+              return Math.sqrt(dx * dx + dy * dy);
+            },
+            infinite: true
+          })
+        } 
+        onClick = { this.userMapClick } >
+          <HeatmapLayer fitBoundsOnLoad fitBoundsOnUpdate points={ points } longitudeExtractor={ m=> m[1] } 
+          latitudeExtractor = { m => m[0] } intensityExtractor = { m => parseFloat(m[2]) } />
+            <ImageOverlay url={ "maps/" + this.state.currentMapFile + ".png" } 
+            bounds={ [ [0, 0], [this.state.currentMapDimension, this.state.currentMapDimension] ] } /> 
             { 
               this.state.selectedPoint !== null &&
               <Marker position={ this.state.selectedPoint }>
@@ -99,7 +135,7 @@ class MapComponent extends Component {
                       Search Radius
                       <input value={ this.state.selectedRadius } onChange={ this.updateCircle } />
                     </label>
-                    <input type="submit" value="Submit"/>
+                    <input type="submit" value="Find Kills" onClick={this.findKills}/>
                   </form>
                 </Popup>
               </Marker>
@@ -123,12 +159,10 @@ class MapComponent extends Component {
 
 class HuntingLocationPanel extends Component {
   render() {
-    return ( <
-      div className = "col panel-layout" >
-      <
-      MapComponent / >
-      <
-      /div>
+    return ( 
+      <div className = "col panel-layout" >
+        <MapComponent/>
+      </div>
     );
   }
 }
