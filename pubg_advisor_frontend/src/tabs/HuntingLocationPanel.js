@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Typography } from '@material-ui/core';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
-import DropdownButton from 'react-bootstrap/DropdownButton';
-import Dropdown from 'react-bootstrap/Dropdown';
 import { Map, ImageOverlay, GridLayer, Marker, Popup, CircleMarker} from "react-leaflet";
+import { NativeSelect } from '@material-ui/core';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
 import L from 'leaflet';
+import './HuntingLocationPanel.css';
 
 const mapNames = ["Camp Jackal", "Erangel", "Karakin", "Miramar", "Sanhok", "Vikendi"];
 
 class MapComponent extends Component {
     
-
     constructor(props) {
         super(props)
         var fileName = this.getMapFileName(mapNames[0])
@@ -24,6 +25,10 @@ class MapComponent extends Component {
         this.updateCircle = this.updateCircle.bind(this);
     }
 
+    componentDidMount() {
+        console.log(this.state);
+    }
+
     getMapFileName(mapName) {
         var fileName =null;
         if (mapName == "Camp Jackal") {
@@ -34,15 +39,18 @@ class MapComponent extends Component {
         return fileName;
     }
 
-    handleSelect = (selectedMap) => {
+    handleSelect = (event) => {
+        console.log(event.target);
+        var selectedMap = event.target.value;
         console.log(selectedMap);
         var fileName = this.getMapFileName(selectedMap);
 
         this.setState(
-            {currentMap: selectedMap,
-            currentMapFile: fileName,
-            selectedPoint: this.state.selectedPoint,
-            selectedRadius: this.state.selectedRadius
+            {
+                currentMap: selectedMap,
+                currentMapFile: fileName,
+                selectedPoint: this.state.selectedPoint,
+                selectedRadius: this.state.selectedRadius
             }
         );
     }
@@ -75,22 +83,20 @@ class MapComponent extends Component {
         var b = 300;
 
         function ListItem(args) {
-            return <Dropdown.Item onSelect={args.handleSelect} eventKey={args.name}>{args.name}</Dropdown.Item>
+            return <option value={args.name}>{args.name}</option>
         }
 
-        var points = [];
-        
+        var points = [
+            
+        ];
      
         return(
-
             <div>
-                
-                <DropdownButton id="dropdown-basic-button" title={this.state.currentMap} >
+                <NativeSelect id="select" value={this.state.currentMap} onChange={this.handleSelect}>
                     {mapNames.map((value, index) => {
-                        return <ListItem key={index} name={value} handleSelect={this.handleSelect}/>
-
+                        return <ListItem key={index} name={value}/>
                     })}
-                </DropdownButton>
+                </NativeSelect>
                 <Map center={this.state.selectedPoint ? this.state.selectedPoint :[b/2,b/2]} zoom={2} id="physicalMap" ref={(ref) => { this.map = ref; }} setMaxBounds={[[0,0], [b,b]] } crs={L.CRS.Simple} onClick={this.userMapClick}>
                     <HeatmapLayer
                         fitBoundsOnLoad
@@ -100,8 +106,9 @@ class MapComponent extends Component {
                         }
                         longitudeExtractor={m => m[1]}
                         latitudeExtractor={m => m[0]}
-                        intensityExtractor={m => parseFloat(m[2])} />
-                    <ImageOverlay url={"maps/" + this.state.currentMapFile+ ".png"} bounds={[[0,0], [b,b]]}/>
+                        intensityExtractor={m => parseFloat(m[2])} 
+                    />
+                    <ImageOverlay url={"maps/"+this.state.currentMapFile+".png"} bounds={[[0,0], [b,b]]}/>
                     { 
                         this.state.selectedPoint !== null &&
                         <Marker position={this.state.selectedPoint}>
@@ -122,14 +129,17 @@ class MapComponent extends Component {
                             <Popup>Popup in CircleMarker</Popup>
                         </CircleMarker>
                     }
-                </Map>}
+                </Map>
+
             </div>
         );
     
     }
     
 }
-class HuntingLocationPanel extends React.Component {
+
+
+class HuntingLocationPanel extends Component {
   render() {
     return (
       <div className="col panel-layout">
