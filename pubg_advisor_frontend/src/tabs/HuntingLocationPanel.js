@@ -74,12 +74,18 @@ class MapComponent extends Component {
     clickEvent.preventDefault();
     console.log("Finding kills");
     console.log(this.state.selectedPoint);
+    var mapAPIname = this.state.apiNames.get(this.state.currentMap);
+    var x = this.state.selectedPoint.lng;
+    var y = this.state.selectedPoint.lat;
+    var radius = this.state.selectedRadius;
+    fetch(`http://ec2-18-233-8-23.compute-1.amazonaws.com:12315/kill?map_name=${mapAPIname}&x=${x}&y=${y}&radius=${radius}`)
+    .then((response) => {
+      console.log(response);
+    });
   }
 
 
   render() {
-    var b = 300;
-
     function ListItem(args) {
       return <option value = {args.name} > {args.name} </option>
     }
