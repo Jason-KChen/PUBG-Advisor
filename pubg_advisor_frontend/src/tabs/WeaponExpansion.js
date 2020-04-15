@@ -55,7 +55,7 @@ const ExpansionPanelDetails = withStyles((theme) => ({
   },
 }))(MuiExpansionPanelDetails);
 
-export default function WeaponExpansion() {
+export default function WeaponExpansion(props) {
   const [expanded, setExpanded] = React.useState('panel1');
 
   const handleChange = (panel) => (event, newExpanded) => {
@@ -74,16 +74,16 @@ export default function WeaponExpansion() {
               src={Item_Weapon_Mini14_C} alt="Item_Weapon_Mini14_C" />
         </ExpansionPanelDetails>
         <ul id="parent2">
-          <li2>
+          <li>
           <Typography>
             Muzzle:
             <img style={{ 
               height: 50, width:60, alignItems:'center', transform:'rotate(40deg)'}} 
               src={Item_Attach_Weapon_Muzzle_Suppressor_Small_C} alt="Item_Attach_Weapon_Muzzle_Suppressor_Small_C" />
           </Typography>
-            Name of Muzzle
-          </li2>
-          <li2>
+            {props.weapons[0]}
+          </li>
+          <li>
           <Typography>
             Scope:
             <img style={{ 
@@ -91,7 +91,7 @@ export default function WeaponExpansion() {
               src={Item_Attach_Weapon_Upper_CQBSS_C} alt="Item_Attach_Weapon_Upper_CQBSS_C" />
           </Typography>
           Name of Scope
-          </li2>
+          </li>
         </ul>
       </ExpansionPanel>
       <ExpansionPanel square expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>

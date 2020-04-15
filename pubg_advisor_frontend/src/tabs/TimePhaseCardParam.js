@@ -22,17 +22,17 @@ const useStyles = makeStyles({
   });
 
   class TimePhaseCardParam extends React.Component{
-    constructor(props){
-     super(props);
-        this.state={
-           cardNum:"",
-         };
-      }
-    componentDidMount(){
-        this.setState({
-            cardNum: this.props.num,
-        });
-    }
+    // constructor(props){
+    //  super(props);
+    //     this.state={
+    //        cardNum:"",
+    //      };
+    //   }
+    // componentDidMount(){
+    //     this.setState({
+    //         cardNum: this.props.num,
+    //     });
+    // }
   // componentWillRecieveProps(nextProps,nextState){
   //   this.setState({
   //    cardNum:nextProps["num"],
@@ -46,10 +46,10 @@ const useStyles = makeStyles({
     render() {
     return (
         // {/* <Card className={classes.root} variant="outlined"> */}
-        <Card num={this.state.cardNum} style={{ minWidth: 275,}}  variant="outlined">
+        <Card num={this.props.num} style={{ minWidth: 275,}}  variant="outlined">
             <CardContent>
               <Typography variant="h5" component="h2">
-                PHASE # {this.state.cardNum}
+                PHASE # {this.props.num}
               </Typography>
               {/* <Typography className={classes.pos} color="textSecondary"> */}
               <Typography style={{ marginBottom: 12,}} color="textSecondary">
@@ -57,7 +57,7 @@ const useStyles = makeStyles({
               </Typography>
             </CardContent>
             <CardActions>
-              <WeaponExpansion/>
+              <WeaponExpansion weapons={this.props.weaponsForThisStage} />
             </CardActions>
         </Card>
     );

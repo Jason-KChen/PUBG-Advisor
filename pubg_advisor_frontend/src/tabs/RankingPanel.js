@@ -13,6 +13,27 @@ import { TimePhaseCardParam } from './TimePhaseCardParam';
 
 
 class RankingPanel extends React.Component {
+  state = {
+    first: ["A", "B", "C"],
+    second: [],
+    third: []
+  }
+
+  async componentDidMount() {
+    try {
+      let res = await fetch("http://ec2-18-233-8-23.compute-1.amazonaws.com:12315/weapon_ranking", {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      })
+      const data = await res.json()
+
+      console.log(data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   render() {
     // const classes = useStyles();
@@ -24,20 +45,20 @@ class RankingPanel extends React.Component {
         <SimpleBar style={{ maxHeight: 490 }}>
         <ul id="parent">
           <li>
-          <TimePhaseCardParam num = "1"/>
-          <TimePhaseCardParam num = "3" />
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "1"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "3" />
           </li>
           <li>
-          <TimePhaseCardParam num = "2"/>
-          <TimePhaseCardParam num = "4"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "2"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "4"/>
           </li>
           <li>
-          <TimePhaseCardParam num = "5"/>
-          <TimePhaseCardParam num = "7"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "5"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "7"/>
           </li>
           <li>
-          <TimePhaseCardParam num = "6"/>
-          <TimePhaseCardParam num = "8"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "6"/>
+          <TimePhaseCardParam weaponsForThisStage={this.state.first} num = "8"/>
           </li>
         </ul>
         </SimpleBar>
