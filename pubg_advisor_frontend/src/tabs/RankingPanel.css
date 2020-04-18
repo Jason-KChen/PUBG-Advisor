@@ -1,0 +1,21 @@
+#parent {
+    list-style: none;
+    width: 115%;
+    /* height: 90px; */
+    /* margin: 0;
+    padding: 0; */
+    /* white-space: nowrap; */
+    /* overflow-x: auto; */
+    /* overflow-y: hidden; */
+}
+
+#parent > li {
+    display: inline-block;
+    width: 40%;
+    height: 100%;
+    /* background-color: red; */
+}
+
+/* #parent > li:nth-child(even) {
+    background-color: blue;
+} */

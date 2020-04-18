@@ -1,0 +1,24 @@
+.ExpansionPanelDetails{
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+#parent2 {
+    list-style: none;
+    width: 80%;
+    /* height: 90px; */
+    /* margin: 0;
+    padding: 0; */
+    /* white-space: nowrap; */
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+#parent2 > li2 {
+    display: inline-block;
+    width: 50%;
+    height: 100%;
+}
+
+/* #parent > li:nth-child(even) {
+    background-color: blue;
+} */
