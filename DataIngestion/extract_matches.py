@@ -8,6 +8,8 @@ from time import sleep
 from dotenv import load_dotenv
 load_dotenv()
 
+from util import writeToMongo
+
 
 BASE_URL = "https://api.pubg.com/shards/steam/"
 
@@ -100,6 +102,7 @@ def fetch_match_ids():
                 f.write("{}\n".format(match_id))
     else:
         # Write to Mongo, TODO
+        writeToMongo(final_match_ids)
         pass
         
 

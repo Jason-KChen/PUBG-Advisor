@@ -9,6 +9,7 @@ from random import randrange
 from dotenv import load_dotenv
 load_dotenv()
 
+from util import writeToMongo
 
 # Filter matches on mode
 # only allow the following
@@ -167,6 +168,7 @@ def discover_matches_and_filter(parition_file_name):
 
         else:
             # Write to Mongo, TODO
+            writeToMongo(match_ids)
             pass
 
         print(f"Finished with {count} qualified matches")
