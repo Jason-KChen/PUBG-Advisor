@@ -1,5 +1,11 @@
 # PUBG-Advisor
 
+## Hadoop & Spark Cluster Versions
+- Java 8
+- Hadoop 2.7
+- Spark 2.4
+
+
 ## Code Organization
 - Every folder is a sub component/project of the whole system, see README in each folder for details
 
