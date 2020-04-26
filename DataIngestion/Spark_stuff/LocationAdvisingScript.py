@@ -57,6 +57,7 @@ class KillLocationFinder:
                     )
                     lenOfKL += 1
         # print(killLocations)
+        print(f"total time is {time.time() - start}")
         return map(lambda x: (x[0], x[1]), killLocations)
 
 if __name__== "__main__":
