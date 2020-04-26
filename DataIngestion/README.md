@@ -4,7 +4,7 @@
 #### The master branch contains the mitigation Python Parser to parallelize intial data loading
 
 #### The feature with saving to MongoDB is available in branch `19`
-#### The feature with PySpark Streaming is available in branch `.`
+#### The feature with PySpark Streaming is available in branch `LocationAdvisingSpark`
 
 #### To run the scripts
 1. setup Python Virtul environment with Python 3.7
