@@ -3,9 +3,8 @@ import math
 import time
 
 
+
 class KillLocationFinder:
-
-
 
     def __init__(self, mapPath, x, y, searchRadius):
         self.mapPath = mapPath
@@ -27,8 +26,8 @@ class KillLocationFinder:
         with open(self.mapPath, "r") as file:
             start = time.time()
             for index, line in enumerate(file):
-                if index % 1000000.0 == 0:
-                    print(f"index is currently at {index}. Total time elapsed is {time.time() - start}\n")
+                if index % 1000000 == 0:
+                    print(f"index is currently at {index}. Total time elapsed is {time.time() - start}")
 
                 splitted = line.split(",")
                 attacker_x = int(splitted[3])
@@ -45,20 +44,27 @@ class KillLocationFinder:
                     int(self.distance_cal(zone_x, zone_y, self.x, self.y)), # Zone center offset
                     abs(zone_radius - self.searchRadius) # zone radius offset
                 )
-
+                killLocations.append(el)
                 
-                if self.filter_info(el):
-                    if lenOfKL > 5000:
-                        killLocations.remove(min(killLocations, key=lambda x: x[2]))
-                        lenOfKL -= 1
-                    # print("Adding el")
-                    killLocations.append(
-                        el
-                    )
-                    lenOfKL += 1
-        # print(killLocations)
+                #if self.filter_info(el):
+                #    if lenOfKL > 5000:
+                #        killLocations.remove(min(killLocations, key=lambda x: x[2]))
+                #        lenOfKL -= 1
+                #    # print("Adding el")
+                #    killLocations.append(
+                #        el
+                #    )
+                #    lenOfKL += 1
+        print(len(killLocations))
+        killLocations = [
+            e for e in killLocations if e[3] < self.ZONE_CENTER_OFFSET and e[4] < self.ZONE_RADIUS_OFFSET
+        ]
+        killLocations.sort(key=lambda e: e[2])
+        
+
         print(f"total time is {time.time() - start}")
         return map(lambda x: (x[0], x[1]), killLocations)
+
 
 if __name__== "__main__":
     if len(sys.argv) != 5:
